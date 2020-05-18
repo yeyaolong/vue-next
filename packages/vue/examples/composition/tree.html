@@ -22,7 +22,7 @@
 </script>
 <!-- item script -->
 <script>
-const { reactive, computed, toRefs } = Vue
+const { reactive, computed, toRefs, watchEffect } = Vue
 
 const TreeItem = {
   name: 'TreeItem', // necessary for self-reference
@@ -37,6 +37,18 @@ const TreeItem = {
         return props.model.children && props.model.children.length
       })
     })
+
+   watchEffect(() => {
+     console.log(state.open)
+   }, {
+     flush: 'post',
+     onTrack(event) {
+       console.log('触发onTrack', event);
+     },
+     onTrigger(event) {
+       console.log('触发onTrigger', event);
+     }
+   })
 
     function toggle() {
       state.open = !state.open

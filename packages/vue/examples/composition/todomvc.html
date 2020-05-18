@@ -120,7 +120,16 @@ createApp({
     })
 
     watchEffect(() => {
+      console.log('aaaaa')
       todoStorage.save(state.todos)
+    }, {
+      flush: 'post',   // pre 组件更新前触发 post(默认) 组件更新后触发 sync 与组件更新同步触发
+      onTrack(event) {
+          console.log('触发OnTrack',event);
+      },
+      onTrigger(event) {
+          console.log('触发onTrigger', event);
+      }
     })
 
     onMounted(() => {

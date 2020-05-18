@@ -33,6 +33,11 @@ const TreeItem = {
       open: false
     }
   },
+  watch: {
+    open(newVal, oldVal) {
+      console.log('classic', newVal)
+    }
+  },
   computed: {
     isFolder() {
       return this.model.children &&
