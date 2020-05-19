@@ -210,6 +210,7 @@ function doWatch(
 
   // in SSR there is no need to setup an actual effect, and it should be noop
   // unless it's eager
+  // SSR 表示 服务端渲染 https://ssr.vuejs.org/zh/
   if (__NODE_JS__ && isInSSRComponentSetup) {
     if (!cb) {
       getter()

@@ -19,6 +19,7 @@
       <li class="add" @click="addChild">+</li>
     </ul>
   </li>
+  <button @click="stop">停止监听</button>
 </script>
 <!-- item script -->
 <script>
@@ -38,7 +39,7 @@ const TreeItem = {
       })
     })
 
-   watchEffect(() => {
+   let stop = watchEffect(() => {
      console.log(state.open)
    }, {
      flush: 'post',
@@ -70,7 +71,8 @@ const TreeItem = {
       ...toRefs(state),
       toggle,
       changeType,
-      addChild
+      addChild,
+      stop
     }
   }
 }
