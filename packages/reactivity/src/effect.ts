@@ -15,7 +15,7 @@ export interface ReactiveEffect<T = any> {
   id: number
   active: boolean
   raw: () => T
-  deps: Array<Dep>
+  deps: Array<Dep>  // 深层对象
   options: ReactiveEffectOptions
 }
 
@@ -60,6 +60,7 @@ export function effect<T = any>(
   }
   const effect = createReactiveEffect(fn, options)
   if (!options.lazy) {
+    // 不使用懒加载
     effect()
   }
   return effect
@@ -81,6 +82,19 @@ function createReactiveEffect<T = any>(
   fn: (...args: any[]) => T,
   options: ReactiveEffectOptions
 ): ReactiveEffect<T> {
+  // java中会先执行finally语句，再执行try 中的 return语句. 既然js是仿照java写的，那js应该也是这样执行的
+    // 也即，执行顺序是这样的
+    /**
+     *  
+     * 1. enableTracking()
+     * 2. effectStack.push
+     * 3. activeEffect = effect
+     * 4. 将 fn(...args) 放到局部变量中保存
+     * 5. effectStack.pop()
+     * 6. resetTracking()
+     * 7. activeEffect = effectStack[effect.length - 1];
+     * 9. return fn(...args)
+     */
   const effect = function reactiveEffect(...args: unknown[]): unknown {
     if (!effect.active) {
       return options.scheduler ? undefined : fn(...args)
@@ -89,20 +103,21 @@ function createReactiveEffect<T = any>(
       cleanup(effect)
       try {
         enableTracking()
-        effectStack.push(effect)
+        effectStack.push(effect)  // 将响应放到栈中
         activeEffect = effect
-        return fn(...args)
-      } finally {
+        return fn(...args)  // 执行
+      } finally {        
         effectStack.pop()
-        resetTracking()
-        activeEffect = effectStack[effectStack.length - 1]
+        resetTracking() // 重置数据追踪
+        activeEffect = effectStack[effectStack.length - 1]  // 将当前响应设置为栈顶
       }
     }
   } as ReactiveEffect
+
   effect.id = uid++
   effect._isEffect = true
   effect.active = true
-  effect.raw = fn
+  effect.raw = fn // 其实是把fn存储下来 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/raw
   effect.deps = []
   effect.options = options
   return effect
@@ -136,6 +151,8 @@ export function resetTracking() {
   shouldTrack = last === undefined ? true : last
 }
 
+
+// 数据追踪的钩子
 export function track(target: object, type: TrackOpTypes, key: unknown) {
   if (!shouldTrack || activeEffect === undefined) {
     return
@@ -161,7 +178,7 @@ export function track(target: object, type: TrackOpTypes, key: unknown) {
     }
   }
 }
-
+// 
 export function trigger(
   target: object,
   type: TriggerOpTypes,

@@ -46,11 +46,12 @@ function createRef(rawValue: unknown, shallow = false) {
   if (isRef(rawValue)) {
     return rawValue
   }
+  // 如果ref(target)  target是一个对象， 那么调用convert方法，将调用reactive方法进行深层响应转换.
   let value = shallow ? rawValue : convert(rawValue)
   const r = {
     __v_isRef: true,
     get value() {
-      track(r, TrackOpTypes.GET, 'value')
+      track(r, TrackOpTypes.GET, 'value'); // 观察者模式 在这里体现为一个钩子函数
       return value
     },
     set value(newVal) {
@@ -125,9 +126,11 @@ export function toRef<T extends object, K extends keyof T>(
   return {
     __v_isRef: true,
     get value(): any {
+      // 这里为什么不用track 钩子? 因为toRef的第一个参数object必然是reactive object,而reactive object 创建的时候就已经有track钩子了. trigger钩子同理
       return object[key]
     },
     set value(newVal) {
+      // 这里为什么不用 trigger 钩子
       object[key] = newVal
     }
   } as any

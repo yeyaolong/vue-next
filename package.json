@@ -22,8 +22,7 @@
   "tsd": {
     "directory": "test-dts"
   },
-  "gitHooks": {
-  },
+  "gitHooks": {},
   "lint-staged": {
     "*.js": [
       "prettier --write",

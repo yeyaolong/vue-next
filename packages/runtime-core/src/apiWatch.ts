@@ -166,14 +166,18 @@ function doWatch(
   } else if (isFunction(source)) {
     if (cb) {
       // getter with cb
+      // 响应式数据是function，却定义了watch方法来监听它，那么直接报错
       getter = () =>
         callWithErrorHandling(source, instance, ErrorCodes.WATCH_GETTER)
     } else {
       // no cb -> simple effect
       getter = () => {
+        // 这里相当于vue2中的methods了，在实例挂载前初始化methods
         if (instance && instance.isUnmounted) {
           return
         }
+        // 实例（组件）挂载后再定义响应式的methods，就直接return报错了
+        // 也不再做什么响应式调用了，直接清空
         if (cleanup) {
           cleanup()
         }
