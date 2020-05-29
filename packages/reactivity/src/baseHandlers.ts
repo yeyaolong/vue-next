@@ -47,7 +47,7 @@ function createGetter(isReadonly = false, shallow = false) {
     if (targetIsArray && hasOwn(arrayInstrumentations, key)) {
       return Reflect.get(arrayInstrumentations, key, receiver)
     }
-    const res = Reflect.get(target, key, receiver)
+    const res = Reflect.get(target, key, receiver)  // Reflect保证默认行为,比如你给一个proxy对象自定义了一个get方法，里面执行了很多内容.但是你仍然可以用reflect.get获取在做proxy自定义get前所应该做的默认行为，而不会触发proxy.get获得的数据
 
     if (isSymbol(key) && builtInSymbols.has(key) || key === '__proto__') {
       return res
