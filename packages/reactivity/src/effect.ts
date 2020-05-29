@@ -117,7 +117,7 @@ function createReactiveEffect<T = any>(
   effect.id = uid++
   effect._isEffect = true
   effect.active = true
-  effect.raw = fn // 其实是把fn存储下来 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/raw
+  effect.raw = fn // 把原版本，未做effect操作的fn存储下来 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/raw
   effect.deps = []
   effect.options = options
   return effect

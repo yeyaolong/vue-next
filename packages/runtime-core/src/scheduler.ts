@@ -44,8 +44,10 @@ export function queuePostFlushCb(cb: Function | Function[]) {
 }
 
 function queueFlush() {
+  // 是否正在执行队列中的内容
   if (!isFlushing && !isFlushPending) {
     isFlushPending = true
+    //
     nextTick(flushJobs)
   }
 }

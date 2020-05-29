@@ -164,15 +164,17 @@ function doWatch(
     getter = () => source
     deep = true
   } else if (isFunction(source)) {
+    // watchEffect中传过来的是function
     if (cb) {
       // getter with cb
-      // 响应式数据是function，却定义了watch方法来监听它，那么直接报错
+      // 数据是function，说明是watchEffect调用的，而cb是watch中的配置，所以这里直接报错
       getter = () =>
         callWithErrorHandling(source, instance, ErrorCodes.WATCH_GETTER)
     } else {
       // no cb -> simple effect
       getter = () => {
         // 这里相当于vue2中的methods了，在实例挂载前初始化methods
+        // 如果这个时候实例还没有挂载，那就不用检测了
         if (instance && instance.isUnmounted) {
           return
         }
@@ -201,6 +203,8 @@ function doWatch(
   }
 
   if (cb && deep) {
+    // 有cb,有deep,说明是watch调用的
+    // deep = true ，做深度监听
     const baseGetter = getter
     getter = () => traverse(baseGetter())
   }
@@ -250,13 +254,18 @@ function doWatch(
         }
       }
     : void 0
-
+  // 根据flush配置一个scheduler方法
   let scheduler: (job: () => any) => void
   if (flush === 'sync') {
-    scheduler = invoke
+    scheduler = invoke  // invoke 翻译：引用，调用 = =我看不段代码是要干啥
   } else if (flush === 'pre') {
+    // 定义一个scheduler方法
+
+    // 如果用了`pre`配置,那么component挂载之前,watch被第一次调用
     scheduler = job => {
+      // 如果instance不存在，或者instance已经挂载
       if (!instance || instance.isMounted) {
+        // 放入待执行队列
         queueJob(job)
       } else {
         // with 'pre' option, the first call must happen before
@@ -265,19 +274,21 @@ function doWatch(
       }
     }
   } else {
+    // flush === 'post', 在dom更新后触发
     scheduler = job => queuePostRenderEffect(job, instance && instance.suspense)
   }
 
+  // 生成一个响应函数
   const runner = effect(getter, {
     lazy: true,
     // so it runs before component update effects in pre flush mode
     computed: true,
     onTrack,
     onTrigger,
-    scheduler: applyCb ? () => scheduler(applyCb) : scheduler
+    scheduler: applyCb ? () => scheduler(applyCb) : scheduler 
   })
 
-  recordInstanceBoundEffect(runner)
+  recordInstanceBoundEffect(runner) // 将runner挂到当前vue实例下
 
   // initial run
   if (applyCb) {
