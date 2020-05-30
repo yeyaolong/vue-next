@@ -25,15 +25,16 @@ export {
 } from '@vue/reactivity'
 export { computed } from './apiComputed'
 export { watch, watchEffect } from './apiWatch'
+// vue3.0
 export {
-  onBeforeMount,
-  onMounted,
-  onBeforeUpdate,
-  onUpdated,
-  onBeforeUnmount,
-  onUnmounted,
-  onActivated,
-  onDeactivated,
+  onBeforeMount,  // 对应beforeMount
+  onMounted,  // 对应mounted
+  onBeforeUpdate,// 对应beforeUpdate
+  onUpdated,  // 对应updated
+  onBeforeUnmount,// 对应beforeDestroyed
+  onUnmounted,// 对应destroyed
+  onActivated,// 对应activiated
+  onDeactivated,// 对应deacticated
   onRenderTracked,
   onRenderTriggered,
   onErrorCaptured
