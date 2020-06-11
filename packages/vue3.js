@@ -26,8 +26,6 @@ function hasChanged(oldValue, value) {
     return oldValue !== value;
 }
 
-function trigger() {}
-
 function createReactiveObject(target) {
     if (!isObject(target)) {
         return target;
