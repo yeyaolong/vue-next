@@ -120,7 +120,10 @@ function createSetter(shallow = false) {
     const hadKey = hasOwn(target, key)
     const result = Reflect.set(target, key, value, receiver) // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect
     // don't trigger if target is something up in the prototype chain of original
-    // 如果是原型链中的某个值被改变了，请不要触发trigger
+    // 如果是原型链中的某个值被改变了，请不要触发trigger   ====> 解决数组的问题（.length是原型链上的，所以是为了阻止二次触发trigger）
+    // 比如array.push(); 实际上会触发两次set方法，第一次是把值放到array里，第二次是设定array.length = array.length + 1
+    // 实际上，push不但会触发两次set, 也会触发两次get。
+     // 关于push的逻辑，可以看一下es规范 https://www.ecma-international.org/ecma-262/6.0/#sec-array.prototype.push
     if (target === toRaw(receiver)) {
       if (!hadKey) {
         // 与createSetter 同理，一个钩子函数. 当对象的值被改变时，会调用trigger钩子

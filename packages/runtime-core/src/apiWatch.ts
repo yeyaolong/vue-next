@@ -257,7 +257,7 @@ function doWatch(
   // 根据flush配置一个scheduler方法
   let scheduler: (job: () => any) => void
   if (flush === 'sync') {
-    scheduler = invoke  // invoke 翻译：引用，调用 = =我看不段代码是要干啥
+    scheduler = invoke  // invoke 翻译：引用，调用 = =我看不懂代码是要干啥
   } else if (flush === 'pre') {
     // 定义一个scheduler方法
 

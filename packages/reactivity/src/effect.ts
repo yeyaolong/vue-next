@@ -61,7 +61,7 @@ export function effect<T = any>(
   const effect = createReactiveEffect(fn, options)
   if (!options.lazy) {
     // 不使用懒加载
-    effect()
+    effect()  // 立即执行一次
   }
   return effect
 }
@@ -105,8 +105,8 @@ function createReactiveEffect<T = any>(
         enableTracking()
         effectStack.push(effect)  // 将响应放到栈中
         activeEffect = effect
-        return fn(...args)  // 执行
-      } finally {        
+        return fn(...args)  // 将函数返回去
+      } finally {
         effectStack.pop()
         resetTracking() // 重置数据追踪
         activeEffect = effectStack[effectStack.length - 1]  // 将当前响应设置为栈顶
